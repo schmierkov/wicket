@@ -23,20 +23,20 @@ defmodule Wicket.Bot do
     command_list = String.split(message.text, " ")
     main_cmd = Enum.at(command_list, 0) |> String.to_atom()
 
-    command_list
-    |> List.replace_at(0, main_cmd)
-    |> IO.inspect()
-    |> process_command(message.user, message.channel, slack)
+    if Enum.member?([:help, :coin], main_cmd) do
+      command_list
+      |> List.replace_at(0, main_cmd)
+      |> process_command(message.user, message.channel, slack)
+    end
   end
 
   defp get_currency(currency) do
     HTTPoison.get!("https://api.coinmarketcap.com/v1/ticker/#{currency}/?convert=EUR") |> case do
       %HTTPoison.Response{status_code: 200, body: body} -> body
-      _                                                 -> nil
+      _                                                 -> "unbekannter coin `#{currency}`"
     end
   end
 
-  defp extract_value(nil), do: "API nicht erreichbar"
   defp extract_value(body) do
     try do
       [%{
@@ -48,7 +48,7 @@ defmodule Wicket.Bot do
 
       "#{pretty_price(eur)}€ / 1h change #{percent_change_1h}% / 24h change #{percent_change_24h}% / 7d change #{percent_change_7d}%"
     rescue
-      Poison.SyntaxError -> "kann dat nich lesen"
+      Poison.SyntaxError -> "kann API daten nich lesen"
     end
   end
 
