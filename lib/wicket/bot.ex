@@ -53,9 +53,8 @@ defmodule Wicket.Bot do
 
   defp pretty_price(nil), do: "-"
   defp pretty_price(value) do
-    value
-    |> Float.parse()
-    |> Float.round(2)
+    {number, _} = Float.parse(value)
+    Float.round(number, 2)
   end
 
   def process_command([:coin, currency], _user, channel, slack) do
