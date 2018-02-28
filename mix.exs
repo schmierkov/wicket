@@ -14,7 +14,7 @@ defmodule Wicket.Mixfile do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger],
+      extra_applications: [:logger, :cowboy],
       mod: {Wicket, []}
     ]
   end
@@ -22,7 +22,8 @@ defmodule Wicket.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:slack, "~> 0.12.0"}
+      {:slack, "~> 0.12.0"},
+      {:cowboy, "~> 1.0.0"}
     ]
   end
 end

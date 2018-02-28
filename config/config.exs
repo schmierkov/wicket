@@ -3,7 +3,8 @@
 use Mix.Config
 
 config :wicket, Wicket,
-  slack_token: System.get_env("SLACK_TOKEN")
+  slack_token: System.get_env("SLACK_TOKEN"),
+  http_port: String.to_integer(System.get_env("PORT"))
 
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this
