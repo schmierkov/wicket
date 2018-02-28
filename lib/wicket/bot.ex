@@ -66,7 +66,11 @@ defmodule Wicket.Bot do
   defp pretty_price(nil), do: "-"
   defp pretty_price(value) do
     {number, _} = Float.parse(value)
-    Float.round(number, 2)
+    if number < 1 do
+      number
+    else
+      Float.round(number, 2)
+    end
   end
 
   defp normalize_currency(value) do
