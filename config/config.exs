@@ -4,6 +4,7 @@ use Mix.Config
 
 config :wicket, Wicket,
   slack_token: System.get_env("SLACK_TOKEN"),
+  reaction_url: System.get_env("REACTION_URL"),
   http_port: String.to_integer(System.get_env("PORT") || "3000")
 
 # This configuration is loaded before any dependency and is restricted
