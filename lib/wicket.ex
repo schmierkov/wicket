@@ -9,7 +9,7 @@ defmodule Wicket do
     # Define workers and child supervisors to be supervised
     children = [worker(Slack.Bot, [Wicket.Bot, [], slack_token])]
 
-    opts = [strategy: :one_for_one, name: Wicket.Supervisor]
+    opts = [strategy: :simple_one_for_one, name: Wicket.Supervisor]
 
     {:ok, _pid} = Supervisor.start_link(children, opts)
   end
