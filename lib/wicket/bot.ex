@@ -46,7 +46,7 @@ defmodule Wicket.Bot do
     try do
       %{"bpi" => %{"EUR" => %{"rate" => euro},
                    "USD" => %{"rate" => dollar}}} = Poison.decode!(body)
-      "#{euro}€ / #{dollar}$"
+      "#{euro} € / #{dollar} $"
     rescue
       Poison.SyntaxError -> "kann dat nich lesen"
     end
