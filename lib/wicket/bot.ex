@@ -39,8 +39,14 @@ defmodule Wicket.Bot do
   defp extract_value(nil), do: "API nicht erreichbar"
   defp extract_value(body) do
     try do
-      [%{"price_eur" => eur, "price_usd" => usd}] = Poison.decode!(body)
-      "#{pretty_price(eur)} € / #{pretty_price(usd)} $"
+      [%{
+        "price_eur" => eur,
+        "percent_change_1h" => percent_change_1h,
+        "percent_change_24h" => percent_change_24h,
+        "percent_change_7d" => percent_change_7d
+      }] = Poison.decode!(body)
+
+      "#{pretty_price(eur)}€ - 1h change #{percent_change_1h}% - 24h change #{percent_change_24h}% - 7d change #{percent_change_7d}%"
     rescue
       Poison.SyntaxError -> "kann dat nich lesen"
     end
