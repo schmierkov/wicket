@@ -51,14 +51,14 @@ defmodule Wicket.Bot do
     end
   end
 
-  defp extract_value(nil), do: "coin ist mir nicht bekannt, hier ein keks :cookie:"
-  defp extract_value(body) do
+  defp extract_coin_value(nil), do: "coin ist mir nicht bekannt, hier ein keks :cookie:"
+  defp extract_coin_value(body) do
     [%{
       "price_eur" => eur,
       "percent_change_1h" => percent_change_1h,
       "percent_change_24h" => percent_change_24h,
       "percent_change_7d" => percent_change_7d
-    }] = json_decode(body)
+    }] = body
 
     "#{pretty_price(eur)}€ / 1h change #{percent_change_1h}% / 24h change #{percent_change_24h}% / 7d change #{percent_change_7d}%"
   end
@@ -91,7 +91,8 @@ defmodule Wicket.Bot do
     |> normalize_currency()
     |> currency_url()
     |> call_api()
-    |> extract_value()
+    |> json_decode()
+    |> extract_coin_value()
     |> send_message(channel, slack)
   end
   def process_command([:help], _user, channel, slack), do: send_message("`coin <COIN>` e.g. `coin bitcoin`", channel, slack)
