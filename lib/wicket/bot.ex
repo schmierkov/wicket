@@ -58,8 +58,23 @@ defmodule Wicket.Bot do
     Float.round(number, 2)
   end
 
+  defp normalize_currency(value) do
+    case value do
+      "eth" -> "ethereum"
+      "btc" -> "bitcoin"
+      "ltc" -> "litecoin"
+      "bch" -> "bitcoin-cash"
+      "xrp" -> "ripple"
+      "xrb" -> "nano"
+      "ada" -> "cardano"
+      other -> other
+    end
+  end
+
   def process_command([:coin, currency], _user, channel, slack) do
-    get_currency(currency)
+    currency
+    |> normalize_currency()
+    |> get_currency()
     |> extract_value()
     |> send_message(channel, slack)
   end
