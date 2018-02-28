@@ -1,18 +1,16 @@
 defmodule Wicket do
-  @moduledoc """
-  Documentation for Wicket.
-  """
+  use Application
 
-  @doc """
-  Hello world.
+  def start(_type, _args) do
+    import Supervisor.Spec, warn: false
 
-  ## Examples
+    slack_token = Application.get_env(:wicket, Wicket)[:slack_token]
 
-      iex> Wicket.hello
-      :world
+    # Define workers and child supervisors to be supervised
+    children = [worker(Slack.Bot, [Wicket.Bot, [], slack_token])]
 
-  """
-  def hello do
-    :world
+    opts = [strategy: :one_for_one, name: Wicket.Supervisor]
+
+    {:ok, _pid} = Supervisor.start_link(children, opts)
   end
 end
