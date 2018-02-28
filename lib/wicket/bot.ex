@@ -23,15 +23,12 @@ defmodule Wicket.Bot do
 
   defp command_parser(message, slack) do
     command_list = String.split(message.text, " ")
+    main_cmd = Enum.at(command_list, 1)
+               |> String.to_atom()
 
-    if "<@#{slack.me.id}>" == Enum.at(command_list, 0) do
-      main_cmd = Enum.at(command_list, 1)
-        |> String.to_atom()
-
-      List.delete_at(command_list, 0)
-        |> List.replace_at(0, main_cmd)
-        |> process_command(message.user, message.channel, slack)
-    end
+    command_list
+    |> List.replace_at(0, main_cmd)
+    |> process_command(message.user, message.channel, slack)
   end
 
   defp get_currency(currency) do
@@ -62,10 +59,6 @@ defmodule Wicket.Bot do
     |> extract_value()
     |> send_message(channel, slack)
   end
-  def process_command([:slap], user, channel, slack),      do: send_message("<@#{user}> slap", channel, slack)
-  def process_command([:slap, victim], _, channel, slack), do: send_message("patsch patsch straight in #{victim} sei Gsischt!", channel, slack)
-  def process_command([:ping], user, channel, slack),      do: send_message("<@#{user}> pong", channel, slack)
-  def process_command([:ping, victim], _, channel, slack), do: send_message("#{victim} pong", channel, slack)
-  def process_command([:joke], _, channel, slack),         do: send_message("y u no funny?", channel, slack)
-  def process_command(_, user, channel, slack),            do: send_message("<@#{user}> I don't know this command.", channel, slack)
+  def process_command([:help], _user, channel, slack), do: send_message("`coin <COIN>` e.g. `coin bitcoin`", channel, slack)
+  def process_command([:joke], _user, channel, slack), do: send_message("y u no funny?", channel, slack)
 end
