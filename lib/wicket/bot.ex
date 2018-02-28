@@ -21,8 +21,7 @@ defmodule Wicket.Bot do
 
   defp command_parser(message, slack) do
     command_list = String.split(message.text, " ")
-    main_cmd = Enum.at(command_list, 1)
-               |> String.to_atom()
+    main_cmd = Enum.at(command_list, 0) |> String.to_atom()
 
     command_list
     |> List.replace_at(0, main_cmd)
