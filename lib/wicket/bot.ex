@@ -52,16 +52,13 @@ defmodule Wicket.Bot do
   end
 
   defp extract_coin_value(nil), do: "coin ist mir nicht bekannt, hier ein keks :cookie:"
-  defp extract_coin_value(body) do
-    [%{
-      "price_eur" => eur,
-      "percent_change_1h" => percent_change_1h,
-      "percent_change_24h" => percent_change_24h,
-      "percent_change_7d" => percent_change_7d
-    }] = body
-
+  defp extract_coin_value([%{"price_eur"          => eur,
+                             "percent_change_1h"  => percent_change_1h,
+                             "percent_change_24h" => percent_change_24h,
+                             "percent_change_7d"  => percent_change_7d }]) do
     "#{pretty_price(eur)}€ / 1h change #{percent_change_1h}% / 24h change #{percent_change_24h}% / 7d change #{percent_change_7d}%"
   end
+  defp extract_coin_value(value), do: value
 
   defp pretty_price(nil), do: "-"
   defp pretty_price(value) do
