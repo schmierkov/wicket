@@ -59,4 +59,5 @@ defmodule Wicket.Bot do
   end
   def process_command([:help], _user, channel, slack), do: send_message("`coin <COIN>` e.g. `coin bitcoin`", channel, slack)
   def process_command([:joke], _user, channel, slack), do: send_message("y u no funny?", channel, slack)
+  def process_command(_command, _user, _channel, _slack), do: :noop
 end
