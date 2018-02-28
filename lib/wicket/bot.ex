@@ -34,27 +34,26 @@ defmodule Wicket.Bot do
     end
   end
 
-  defp get_currencies do
-    HTTPoison.get!("https://api.coindesk.com/v1/bpi/currentprice.json") |> case do
+  defp get_currency(currency) do
+    HTTPoison.get!("https://api.coinmarketcap.com/v1/ticker/#{currency}/?convert=EUR") |> case do
       %HTTPoison.Response{status_code: 200, body: body} -> body
       _                                                 -> nil
     end
   end
 
-  defp extract_current_btc(nil), do: "API nicht erreichbar"
-  defp extract_current_btc(body) do
+  defp extract_value(nil), do: "API nicht erreichbar"
+  defp extract_value(body) do
     try do
-      %{"bpi" => %{"EUR" => %{"rate" => euro},
-                   "USD" => %{"rate" => dollar}}} = Poison.decode!(body)
-      "#{euro} € / #{dollar} $"
+      [%{"price_eur" => euro}] = Poison.decode!(body)
+      "#{euro} €"
     rescue
       Poison.SyntaxError -> "kann dat nich lesen"
     end
   end
 
-  def process_command([:btc], _user, channel, slack) do
-    get_currencies()
-    |> extract_current_btc()
+  def process_command([:coin, currency], _user, channel, slack) do
+    get_currency(currency)
+    |> extract_value()
     |> send_message(channel, slack)
   end
   def process_command([:slap], user, channel, slack),      do: send_message("<@#{user}> slap", channel, slack)
