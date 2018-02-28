@@ -7,9 +7,7 @@ defmodule Wicket.Bot do
   end
 
   def handle_event(message = %{type: "message"}, slack, state) do
-    if Regex.run ~r/<@#{slack.me.id}>:?\s/, message.text do
-      command_parser(message, slack)
-    end
+    command_parser(message, slack)
     {:ok, state}
   end
   def handle_event(_, _, state), do: {:ok, state}
