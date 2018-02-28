@@ -26,6 +26,7 @@ defmodule Wicket.Bot do
 
     command_list
     |> List.replace_at(0, main_cmd)
+    |> IO.inspect()
     |> process_command(message.user, message.channel, slack)
   end
 
