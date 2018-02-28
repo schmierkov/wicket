@@ -46,7 +46,7 @@ defmodule Wicket.Bot do
         "percent_change_7d" => percent_change_7d
       }] = Poison.decode!(body)
 
-      "#{pretty_price(eur)}€ - 1h change #{percent_change_1h}% - 24h change #{percent_change_24h}% - 7d change #{percent_change_7d}%"
+      "#{pretty_price(eur)}€ / 1h change #{percent_change_1h}% / 24h change #{percent_change_24h}% / 7d change #{percent_change_7d}%"
     rescue
       Poison.SyntaxError -> "kann dat nich lesen"
     end
