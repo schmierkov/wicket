@@ -14,7 +14,7 @@ defmodule Wicket.Mixfile do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :cowboy],
+      extra_applications: [:logger, :cowboy, :httpoison],
       mod: {Wicket, []}
     ]
   end
@@ -23,7 +23,8 @@ defmodule Wicket.Mixfile do
   defp deps do
     [
       {:slack, "~> 0.12.0"},
-      {:cowboy, "~> 1.0.0"}
+      {:cowboy, "~> 1.0.0"},
+      {:httpoison, "~> 0.11"}
     ]
   end
 end
