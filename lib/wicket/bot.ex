@@ -33,10 +33,11 @@ defmodule Wicket.Bot do
   defp get_currency(currency) do
     HTTPoison.get!("https://api.coinmarketcap.com/v1/ticker/#{currency}/?convert=EUR") |> case do
       %HTTPoison.Response{status_code: 200, body: body} -> body
-      _                                                 -> "unbekannter coin `#{currency}`"
+      _                                                 -> nil
     end
   end
 
+  defp extract_value(nil), do: "coin ist mir nicht bekannt, hier ein keks :cookie:"
   defp extract_value(body) do
     try do
       [%{
