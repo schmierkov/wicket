@@ -23,7 +23,7 @@ defmodule Wicket.Bot do
     command_list = String.split(message.text, " ")
     main_cmd = Enum.at(command_list, 0) |> String.to_atom()
 
-    if Enum.member?([:help, :coin, :lol], main_cmd) do
+    if Enum.member?([:help, :coin, :lol, :curlh], main_cmd) do
       command_list
       |> List.replace_at(0, main_cmd)
       |> process_command(message.user, message.channel, slack)
@@ -36,6 +36,18 @@ defmodule Wicket.Bot do
       %HTTPoison.Response{status_code: 200, body: body} -> body
       _                                                 -> nil
     end
+  end
+
+  defp get_headers(nil), do: nil
+  defp get_headers(url) do
+    HTTPoison.get!(url) |> case do
+      %HTTPoison.Response{status_code: 200, headers: headers} -> headers
+      _                                                       -> nil
+    end
+  end
+
+  defp normalize_value(value) do
+    "#{inspect(value)}"
   end
 
   defp currency_url(currency) do
@@ -97,6 +109,12 @@ defmodule Wicket.Bot do
     |> send_message(channel, slack)
   end
   def process_command([:help], _user, channel, slack), do: send_message("`coin <COIN>` e.g. `coin bitcoin`", channel, slack)
+  def process_command([:curlh, url], _user, channel, slack) do
+    url
+    |> get_headers()
+    |> normalize_value()
+    |> send_message(channel, slack)
+  end
   def process_command([:lol], _user, channel, slack) do
     reaction_url()
     |> call_api()
