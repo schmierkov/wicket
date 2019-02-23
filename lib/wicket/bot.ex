@@ -10,6 +10,7 @@ defmodule Wicket.Bot do
     command_parser(message, slack)
     {:ok, state}
   end
+
   def handle_event(_, _, state), do: {:ok, state}
 
   def handle_info({:message, text, channel}, slack, state) do
@@ -17,6 +18,7 @@ defmodule Wicket.Bot do
 
     {:ok, state}
   end
+
   def handle_info(_, _, state), do: {:ok, state}
 
   defp command_parser(message, slack) do
@@ -31,18 +33,22 @@ defmodule Wicket.Bot do
   end
 
   defp call_api(nil), do: nil
+
   defp call_api(url) do
-    HTTPoison.get!(url) |> case do
+    HTTPoison.get!(url)
+    |> case do
       %HTTPoison.Response{status_code: 200, body: body} -> body
-      _                                                 -> nil
+      _ -> nil
     end
   end
 
   defp get_headers(nil), do: nil
+
   defp get_headers(url) do
-    HTTPoison.get!(url) |> case do
+    HTTPoison.get!(url)
+    |> case do
       %HTTPoison.Response{status_code: 200, headers: headers} -> headers
-      _                                                       -> nil
+      _ -> nil
     end
   end
 
@@ -55,6 +61,7 @@ defmodule Wicket.Bot do
   end
 
   defp json_decode(nil), do: "kann API daten nich lesen"
+
   defp json_decode(body) do
     try do
       Poison.decode!(body)
@@ -63,18 +70,26 @@ defmodule Wicket.Bot do
     end
   end
 
-  defp extract_coin_value(nil), do: "coin ist mir nicht bekannt, hier ein keks :cookie:"
-  defp extract_coin_value([%{"price_eur"          => eur,
-                             "percent_change_1h"  => percent_change_1h,
-                             "percent_change_24h" => percent_change_24h,
-                             "percent_change_7d"  => percent_change_7d }]) do
-    "#{pretty_price(eur)}€ / 1h change #{percent_change_1h}% / 24h change #{percent_change_24h}% / 7d change #{percent_change_7d}%"
+  defp extract_coin_value([
+         %{
+           "price_eur" => eur,
+           "percent_change_1h" => percent_change_1h,
+           "percent_change_24h" => percent_change_24h,
+           "percent_change_7d" => percent_change_7d
+         }
+       ]) do
+    "#{pretty_price(eur)}€ / 1h change #{percent_change_1h}% / 24h change #{percent_change_24h}% / 7d change #{
+      percent_change_7d
+    }%"
   end
-  defp extract_coin_value(value), do: value
+
+  defp extract_coin_value(_), do: "Dieser Coin ist mir nicht bekannt, hier ein Keks :cookie:"
 
   defp pretty_price(nil), do: "-"
+
   defp pretty_price(value) do
     {number, _} = Float.parse(value)
+
     if number < 1 do
       number
     else
@@ -108,13 +123,17 @@ defmodule Wicket.Bot do
     |> extract_coin_value()
     |> send_message(channel, slack)
   end
-  def process_command([:help], _user, channel, slack), do: send_message("`coin <COIN>` e.g. `coin bitcoin`", channel, slack)
+
+  def process_command([:help], _user, channel, slack),
+    do: send_message("`coin <COIN>` e.g. `coin bitcoin`", channel, slack)
+
   def process_command([:curlh, url], _user, channel, slack) do
     url
     |> get_headers()
     |> normalize_value()
     |> send_message(channel, slack)
   end
+
   def process_command([:lol], _user, channel, slack) do
     reaction_url()
     |> call_api()
@@ -122,6 +141,7 @@ defmodule Wicket.Bot do
     |> Enum.take_random(1)
     |> List.first()
     |> send_message(channel, slack)
-   end
+  end
+
   def process_command(_command, _user, _channel, _slack), do: :noop
 end
