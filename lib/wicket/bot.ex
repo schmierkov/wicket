@@ -23,7 +23,7 @@ defmodule Wicket.Bot do
 
   defp command_parser(message, slack) do
     command_list = String.split(message.text, " ")
-    main_cmd = Enum.at(command_list, 0) |> String.to_atom()
+    main_cmd = Enum.at(command_list, 0) |> String.downcase() |> String.to_atom()
 
     if Enum.member?([:help, :coin, :lol, :curlh], main_cmd) do
       command_list
@@ -98,7 +98,10 @@ defmodule Wicket.Bot do
   end
 
   defp normalize_currency(value) do
-    case value do
+    value
+    |> String.downcase()
+    |> String.trim()
+    |> case do
       "eth" -> "ethereum"
       "btc" -> "bitcoin"
       "ltc" -> "litecoin"
@@ -143,5 +146,7 @@ defmodule Wicket.Bot do
     |> send_message(channel, slack)
   end
 
-  def process_command(_command, _user, _channel, _slack), do: :noop
+  def process_command(_command, _user, channel, slack) do
+    send_message("Eh?!", channel, slack)
+  end
 end
