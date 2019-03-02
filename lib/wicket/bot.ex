@@ -1,8 +1,9 @@
 defmodule Wicket.Bot do
   use Slack
+  alias Wicket.Processor.Lol, as: LolProcessor
+  use Wicket.ApiHelper
 
   def handle_connect(_slack, state) do
-    # IO.puts "Connected as #{slack.me.name}"
     {:ok, state}
   end
 
@@ -28,27 +29,8 @@ defmodule Wicket.Bot do
     if Enum.member?([:help, :coin, :lol, :curlh], main_cmd) do
       command_list
       |> List.replace_at(0, main_cmd)
+      |> Enum.reject(fn x -> x == "" || x == nil end)
       |> process_command(message.user, message.channel, slack)
-    end
-  end
-
-  defp call_api(nil), do: nil
-
-  defp call_api(url) do
-    HTTPoison.get!(url)
-    |> case do
-      %HTTPoison.Response{status_code: 200, body: body} -> body
-      _ -> nil
-    end
-  end
-
-  defp get_headers(nil), do: nil
-
-  defp get_headers(url) do
-    HTTPoison.get!(url)
-    |> case do
-      %HTTPoison.Response{status_code: 200, headers: headers} -> headers
-      _ -> nil
     end
   end
 
@@ -58,16 +40,6 @@ defmodule Wicket.Bot do
 
   defp currency_url(currency) do
     "https://api.coinmarketcap.com/v1/ticker/#{currency}/?convert=EUR"
-  end
-
-  defp json_decode(nil), do: "kann API daten nich lesen"
-
-  defp json_decode(body) do
-    try do
-      Poison.decode!(body)
-    rescue
-      Poison.SyntaxError -> "kann API daten nich lesen"
-    end
   end
 
   defp extract_coin_value([
@@ -97,6 +69,24 @@ defmodule Wicket.Bot do
     end
   end
 
+  defp normalize_url(url) do
+    url
+    |> String.split("|")
+    |> List.first()
+    |> String.replace("<", "")
+    |> String.replace(">", "")
+    |> attach_schema()
+  end
+
+  defp attach_schema(url) do
+    url
+    |> String.starts_with?(["https://", "http://"])
+    |> case do
+      true -> url
+      _ -> "http://#{inspect(url)}"
+    end
+  end
+
   defp normalize_currency(value) do
     value
     |> String.downcase()
@@ -111,10 +101,6 @@ defmodule Wicket.Bot do
       "ada" -> "cardano"
       other -> other
     end
-  end
-
-  defp reaction_url() do
-    Application.get_env(:wicket, Wicket)[:reaction_url]
   end
 
   def process_command([:coin, currency], _user, channel, slack) do
@@ -132,17 +118,14 @@ defmodule Wicket.Bot do
 
   def process_command([:curlh, url], _user, channel, slack) do
     url
+    |> normalize_url()
     |> get_headers()
     |> normalize_value()
     |> send_message(channel, slack)
   end
 
   def process_command([:lol], _user, channel, slack) do
-    reaction_url()
-    |> call_api()
-    |> json_decode()
-    |> Enum.take_random(1)
-    |> List.first()
+    LolProcessor.call()
     |> send_message(channel, slack)
   end
 
