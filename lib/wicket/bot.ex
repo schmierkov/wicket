@@ -36,6 +36,7 @@ defmodule Wicket.Bot do
 
   defp normalize_value(value) do
     "#{inspect(value)}"
+    |> String.replace("\"", "")
   end
 
   defp currency_url(currency) do
